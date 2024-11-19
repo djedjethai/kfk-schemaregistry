@@ -29,3 +29,5 @@ examples/avro/go.mod
 examples/avro/go.sum
 examples/avro/Makefile
 
+/.idea
+

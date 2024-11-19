@@ -150,8 +150,23 @@ func TopicNameStrategy(topic string, serdeType Type, fullyQualifiedName ...strin
 	return topic + suffix, nil
 }
 
+// TopicRecordNameStrategy creates a subject name by <topic>-<type>.
+// Where <topic> is the Kafka topic name, and
+// <type> is the fully-qualified name of the Avro record type of the message.
+func TopicRecordNameStrategy(topic string, _ Type, fullyQualifiedName ...string) (string, error) {
+	if topic != "" && len(fullyQualifiedName) > 0 && fullyQualifiedName[0] != "" {
+		return fmt.Sprintf("%s-%s", topic, fullyQualifiedName[0]), nil
+	}
+
+	if topic == "" && len(fullyQualifiedName) > 0 && fullyQualifiedName[0] != "" {
+		return fmt.Sprintf("%s", fullyQualifiedName[0]), nil
+	}
+
+	return topic, nil
+}
+
 // GetID returns a schema ID for the given schema
-func (s *BaseSerializer) GetID(subject string, msg interface{}, info schemaregistry.SchemaInfo) (int, int, error) {
+func (s *BaseSerializer) GetID(subject string, _ interface{}, info schemaregistry.SchemaInfo) (int, int, error) {
 	autoRegister := s.Conf.AutoRegisterSchemas
 	useSchemaID := s.Conf.UseSchemaID
 	useLatest := s.Conf.UseLatestVersion
