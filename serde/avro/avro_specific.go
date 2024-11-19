@@ -151,6 +151,7 @@ func (s *SpecificSerializer) addFullyQualifiedNameToSchema(avroStr string, msg i
 
 // SerializeRecordName implements serialization of generic Avro data
 func (s *SpecificSerializer) SerializeRecordName(msg interface{}, subject ...string) ([]byte, error) {
+	s.SubjectNameStrategy = serde.TopicNameStrategy
 	if msg == nil {
 		return nil, nil
 	}
@@ -198,6 +199,7 @@ func (s *SpecificSerializer) SerializeRecordName(msg interface{}, subject ...str
 
 // SerializeTopicRecordName implements serialization of generic Avro data
 func (s *SpecificSerializer) SerializeTopicRecordName(topic string, msg interface{}, subject ...string) ([]byte, error) {
+	s.SubjectNameStrategy = serde.TopicRecordNameStrategy
 	if msg == nil {
 		return nil, nil
 	}
@@ -258,6 +260,7 @@ func NewSpecificDeserializer(client schemaregistry.Client, serdeType serde.Type,
 
 // DeserializeTopicRecordName implements deserialization of specific Avro data
 func (s *SpecificDeserializer) DeserializeTopicRecordName(topic string, payload []byte) (interface{}, error) {
+	s.SubjectNameStrategy = serde.TopicRecordNameStrategy
 	if payload == nil {
 		return nil, nil
 	}
@@ -461,6 +464,7 @@ func (s *SpecificDeserializer) DeserializeRecordName(payload []byte) (interface{
 
 // DeserializeIntoTopicRecordName implements deserialization of specific Avro data
 func (s *SpecificDeserializer) DeserializeIntoTopicRecordName(topic string, subjects map[string]interface{}, payload []byte) error {
+	s.SubjectNameStrategy = serde.TopicRecordNameStrategy
 	if payload == nil {
 		return nil
 	}

@@ -532,7 +532,11 @@ func RegisterTRNMessageFactorySpecificOnSubject() func([]string, string) (interf
 			switch s {
 			case topicExampleNamespaceValue, secondExampleNamespaceValue:
 				return &rn.DemoSchema{}, nil
+			case topicExampleNamespace, secondExampleNamespace:
+				return &rn.DemoSchema{}, nil
 			case topicComplexDTNamespaceValue, secondComplexDTNamespaceValue:
+				return &rn.Advanced{}, nil
+			case topicComplexDTNamespace, secondComplexDTNamespace:
 				return &rn.Advanced{}, nil
 			}
 		}
@@ -591,7 +595,7 @@ func TestAvroSpecificSerdeDeserializeTopicRecordNameWithoutHandler(t *testing.T)
 
 	// object without packagename
 	newobj, err = deser.DeserializeTopicRecordName("invalid", bytesInner2)
-	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(err.Error(), "no subject found for: invalid-recordname.DemoSchema-value"))
+	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(err.Error(), "no subject found for: invalid-recordname.DemoSchema"))
 	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(newobj, nil))
 
 	newobj, err = deser.DeserializeTopicRecordName(topic, bytesObj)
@@ -599,7 +603,7 @@ func TestAvroSpecificSerdeDeserializeTopicRecordNameWithoutHandler(t *testing.T)
 
 	// object with packagename
 	newobj, err = deser.DeserializeTopicRecordName("invalid", bytesObj)
-	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(err.Error(), "no subject found for: invalid-python.test.advanced.advanced-value"))
+	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(err.Error(), "no subject found for: invalid-python.test.advanced.advanced"))
 	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(newobj, nil))
 
 }
@@ -641,7 +645,7 @@ func TestAvroSpecificSerdeDeserializeTopicRecordNameWithHandlerAndPackageName(t 
 	serde.MaybeFail("deserialization", err, serde.Expect(newobj.(*rn.Advanced).Friends["second"].Number.Long, complexDT.Friends["second"].Number.Long))
 
 	newobj, err = deser.DeserializeTopicRecordName("invalid", bytesObj2)
-	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(err.Error(), "no subject found for: invalid-python.test.advanced.advanced-value"))
+	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(err.Error(), "no subject found for: invalid-python.test.advanced.advanced"))
 	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(newobj, nil))
 }
 
@@ -682,7 +686,7 @@ func TestAvroSpecificSerdeDeserializeTopicRecordNameWithHandlerAndPackageNameOnS
 	serde.MaybeFail("deserialization", err, serde.Expect(newobj.(*rn.Advanced).Friends["second"].Number.Long, complexDT.Friends["second"].Number.Long))
 
 	newobj, err = deser.DeserializeTopicRecordName("invalid", bytesObj2)
-	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(err.Error(), "no subject found for: invalid-python.test.advanced.advanced-value"))
+	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(err.Error(), "no subject found for: invalid-python.test.advanced.advanced"))
 	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(newobj, nil))
 }
 
@@ -718,7 +722,7 @@ func TestAvroSpecificSerdeDeserializeTopicRecordNameWithHandlerAndNoPackageName(
 	serde.MaybeFail("deserialization", err, serde.Expect(newobj.(*rn.DemoSchema).StringField, example.StringField))
 
 	newobj, err = deser.DeserializeTopicRecordName("invalid", bytesInner2)
-	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(err.Error(), "no subject found for: invalid-recordname.DemoSchema-value"))
+	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(err.Error(), "no subject found for: invalid-recordname.DemoSchema"))
 	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(newobj, nil))
 }
 
@@ -754,7 +758,7 @@ func TestAvroSpecificSerdeDeserializeTopicRecordNameWithHandlerAndNoPackageNameO
 	serde.MaybeFail("deserialization", err, serde.Expect(newobj.(*rn.DemoSchema).StringField, example.StringField))
 
 	newobj, err = deser.DeserializeTopicRecordName("invalid", bytesInner2)
-	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(err.Error(), "no subject found for: invalid-recordname.DemoSchema-value"))
+	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(err.Error(), "no subject found for: invalid-recordname.DemoSchema"))
 	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(newobj, nil))
 }
 
@@ -846,9 +850,9 @@ func TestAvroSpecificSerdeDeserializeIntoTopicRecordName(t *testing.T) {
 	serde.MaybeFail("serialization", err)
 
 	var receivers = make(map[string]interface{})
-	receivers[topicExampleNamespaceValue] = &rn.DemoSchema{}
-	receivers[secondExampleNamespaceValue] = &rn.DemoSchema{}
-	receivers[topicComplexDTNamespaceValue] = &rn.Advanced{}
+	receivers[topicExampleNamespace] = &rn.DemoSchema{}
+	receivers[secondExampleNamespace] = &rn.DemoSchema{}
+	receivers[topicComplexDTNamespace] = &rn.Advanced{}
 
 	deser, err := NewSpecificDeserializer(client, serde.ValueSerde, NewDeserializerConfig())
 
@@ -856,16 +860,16 @@ func TestAvroSpecificSerdeDeserializeIntoTopicRecordName(t *testing.T) {
 	deser.Client = ser.Client
 
 	err = deser.DeserializeIntoTopicRecordName(topic, receivers, bytesInner)
-	serde.MaybeFail("deserialization", err, serde.Expect(receivers[topicExampleNamespaceValue].(*rn.DemoSchema).StringField, example.StringField))
+	serde.MaybeFail("deserialization", err, serde.Expect(receivers[topicExampleNamespace].(*rn.DemoSchema).StringField, example.StringField))
 
 	err = deser.DeserializeIntoTopicRecordName(second, receivers, bytesInner2)
-	serde.MaybeFail("deserialization", err, serde.Expect(receivers[secondExampleNamespaceValue].(*rn.DemoSchema).StringField, example.StringField))
+	serde.MaybeFail("deserialization", err, serde.Expect(receivers[secondExampleNamespace].(*rn.DemoSchema).StringField, example.StringField))
 
 	err = deser.DeserializeIntoTopicRecordName(topic, receivers, bytesObj)
-	serde.MaybeFail("deserialization", err, serde.Expect(receivers[topicComplexDTNamespaceValue].(*rn.Advanced).Number.Long, complexDT.Number.Long))
-	serde.MaybeFail("deserialization", err, serde.Expect(receivers[topicComplexDTNamespaceValue].(*rn.Advanced).Name.String, complexDT.Name.String))
-	serde.MaybeFail("deserialization", err, serde.Expect(receivers[topicComplexDTNamespaceValue].(*rn.Advanced).Friends["first"].Name.String, complexDT.Friends["first"].Name.String))
-	serde.MaybeFail("deserialization", err, serde.Expect(receivers[topicComplexDTNamespaceValue].(*rn.Advanced).Friends["second"].Number.Long, complexDT.Friends["second"].Number.Long))
+	serde.MaybeFail("deserialization", err, serde.Expect(receivers[topicComplexDTNamespace].(*rn.Advanced).Number.Long, complexDT.Number.Long))
+	serde.MaybeFail("deserialization", err, serde.Expect(receivers[topicComplexDTNamespace].(*rn.Advanced).Name.String, complexDT.Name.String))
+	serde.MaybeFail("deserialization", err, serde.Expect(receivers[topicComplexDTNamespace].(*rn.Advanced).Friends["first"].Name.String, complexDT.Friends["first"].Name.String))
+	serde.MaybeFail("deserialization", err, serde.Expect(receivers[topicComplexDTNamespace].(*rn.Advanced).Friends["second"].Number.Long, complexDT.Friends["second"].Number.Long))
 }
 
 func TestAvroSpecificSerdeDeserializeIntoTopicRecordNameWithInvalidSchema(t *testing.T) {
@@ -912,8 +916,8 @@ func TestAvroSpecificSerdeDeserializeIntoTopicRecordNameWithInvalidReceiver(t *t
 	serde.MaybeFail("serialization", err)
 
 	var receivers = make(map[string]interface{})
-	receivers[topicExampleNamespaceValue] = &rn.Advanced{}
-	receivers[topicComplexDTNamespaceValue] = ""
+	receivers[topicExampleNamespace] = &rn.Advanced{}
+	receivers[topicComplexDTNamespace] = ""
 
 	deser, err := NewSpecificDeserializer(client, serde.ValueSerde, NewDeserializerConfig())
 
@@ -923,11 +927,11 @@ func TestAvroSpecificSerdeDeserializeIntoTopicRecordNameWithInvalidReceiver(t *t
 	err = deser.DeserializeIntoTopicRecordName(topic, receivers, bytesInner)
 	parts := strings.Split(err.Error(), ":")
 	serde.MaybeFail("deserializeInvalidReceiver", serde.Expect(parts[0], "Incompatible types by name"))
-	serde.MaybeFail("deserialization", serde.Expect(fmt.Sprintf("%v", receivers[topicExampleNamespaceValue]), `&{<nil> { 0} map[] map[]}`))
+	serde.MaybeFail("deserialization", serde.Expect(fmt.Sprintf("%v", receivers[topicExampleNamespace]), `&{<nil> { 0} map[] map[]}`))
 
 	err = deser.DeserializeIntoTopicRecordName(topic, receivers, bytesObj)
 	serde.MaybeFail("deserialization", serde.Expect(err.Error(), "deserialization target must be an avro message. Got ''"))
-	serde.MaybeFail("deserialization", serde.Expect(receivers[topicComplexDTNamespaceValue], ""))
+	serde.MaybeFail("deserialization", serde.Expect(receivers[topicComplexDTNamespace], ""))
 }
 
 func TestAvroSpecificSerdeTopicRecordNamePayloadMismatchSubject(t *testing.T) {
